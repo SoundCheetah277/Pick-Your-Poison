@@ -179,12 +179,6 @@ public class PickYourPoison implements ModInitializer {
     }
 
     public static boolean isComatose(@Nullable LivingEntity entity) {
-        if (entity != null) {
-            if (entity.hasStatusEffect(PickYourPoison.COMATOSE)) {
-                System.out.println("specific " + entity.getName());
-                return true;
-            }
-        }
         return entity != null &&
                 entity.hasStatusEffect(PickYourPoison.COMATOSE) &&
                 !entity.isSpectator() &&

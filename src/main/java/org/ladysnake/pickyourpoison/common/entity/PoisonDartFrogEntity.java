@@ -300,18 +300,21 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
+        this.playSound(PickYourPoison.ENTITY_POISON_DART_FROG_AMBIENT, 1f, 1.0f);
         return PickYourPoison.ENTITY_POISON_DART_FROG_AMBIENT;
     }
 
     @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
+        this.playSound(PickYourPoison.ENTITY_POISON_DART_FROG_HURT, 1f, 1.0f);
         return PickYourPoison.ENTITY_POISON_DART_FROG_HURT;
     }
 
     @Nullable
     @Override
     protected SoundEvent getDeathSound() {
+        this.playSound(PickYourPoison.ENTITY_POISON_DART_FROG_DEATH, 1f, 1.0f);
         return PickYourPoison.ENTITY_POISON_DART_FROG_DEATH;
     }
 
