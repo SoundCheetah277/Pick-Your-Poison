@@ -154,11 +154,6 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
-//    @Override
-//    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-//
-//    }
-
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.animationCache;
@@ -268,7 +263,6 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     }
 
     public void setPoisonDartFrogType(Type type) {
-        //builder.add(TYPE, Type.BLUE.toString());
         this.dataTracker.set(TYPE, type.toString());
     }
 

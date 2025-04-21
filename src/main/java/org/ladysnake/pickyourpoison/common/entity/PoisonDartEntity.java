@@ -2,8 +2,10 @@ package org.ladysnake.pickyourpoison.common.entity;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleUtil;
 import org.jetbrains.annotations.Nullable;
@@ -58,12 +60,6 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
     public double getDamage() {
         return 0.1f;
     }
-
-//    @Override
-//    public int getPunch() {
-//        return 0;
-//    }
-    // TODO: implement punch
 
     public void addEffect(StatusEffectInstance effect) {
         this.effects.add(effect);
