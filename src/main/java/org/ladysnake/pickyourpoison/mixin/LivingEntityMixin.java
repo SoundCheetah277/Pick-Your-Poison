@@ -8,6 +8,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -40,14 +41,14 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @Inject(method = "getPreferredEquipmentSlot", at = @At("HEAD"), cancellable = true)
-    private static void getPreferredEquipmentSlot(ItemStack stack, CallbackInfoReturnable<EquipmentSlot> cir) {
+    private void getPreferredEquipmentSlot(ItemStack stack, CallbackInfoReturnable<EquipmentSlot> cir) {
         if (stack.getItem() instanceof PoisonDartFrogBowlItem) {
             cir.setReturnValue(EquipmentSlot.HEAD);
         }
     }
 
     @Shadow
-    public abstract boolean hasStatusEffect(StatusEffect effect);
+    public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> effect);
 
     @Shadow
     public abstract void setHeadYaw(float headYaw);
@@ -57,7 +58,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow
     @Nullable
-    public abstract StatusEffectInstance getStatusEffect(StatusEffect effect);
+    public abstract StatusEffectInstance getStatusEffect(RegistryEntry<StatusEffect> effect);
 
     @Shadow
     public abstract boolean damage(DamageSource source, float amount);
@@ -96,28 +97,28 @@ public abstract class LivingEntityMixin extends Entity {
             this.stuckYaw = this.getYaw();
         }
 
-        if (this.hasStatusEffect(PickYourPoison.BATRACHOTOXIN) && (this.age % (20 / (MathHelper.clamp(this.getStatusEffect(PickYourPoison.BATRACHOTOXIN).getAmplifier() + 1, 1, 20))) == 0)) {
+        if (this.hasStatusEffect((PickYourPoison.BATRACHOTOXIN)) && (this.age % (20 / (MathHelper.clamp(this.getStatusEffect((PickYourPoison.BATRACHOTOXIN)).getAmplifier() + 1, 1, 20))) == 0)) {
             this.damage(getDamageSources().pypSources().batrachotoxin(), 1);
             this.timeUntilRegen = 0;
         }
 
 
-        if (this.hasStatusEffect(PickYourPoison.COMATOSE) && this.age % (40 / (MathHelper.clamp(this.getStatusEffect(PickYourPoison.COMATOSE).getAmplifier() + 1, 1, 40))) == 0) {
+        if (this.hasStatusEffect((PickYourPoison.COMATOSE)) && this.age % (40 / (MathHelper.clamp(this.getStatusEffect((PickYourPoison.COMATOSE)).getAmplifier() + 1, 1, 40))) == 0) {
             this.heal(1);
         }
     }
 
     @ModifyVariable(method = "damage", at = @At("HEAD"), argsOnly = true)
     private float multiplyDamageForVulnerability(float amount) {
-        if (this.hasStatusEffect(PickYourPoison.VULNERABILITY)) {
-            return amount + (amount * (0.25f * (this.getStatusEffect(PickYourPoison.VULNERABILITY).getAmplifier() + 1)));
+        if (this.hasStatusEffect((PickYourPoison.VULNERABILITY))) {
+            return amount + (amount * (0.25f * (this.getStatusEffect((PickYourPoison.VULNERABILITY)).getAmplifier() + 1)));
         }
         return amount;
     }
 
     @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
     public void torporCancelHeal(float amount, CallbackInfo callbackInfo) {
-        if (this.hasStatusEffect(PickYourPoison.TORPOR)) {
+        if (this.hasStatusEffect((PickYourPoison.TORPOR))) {
             callbackInfo.cancel();
         }
     }

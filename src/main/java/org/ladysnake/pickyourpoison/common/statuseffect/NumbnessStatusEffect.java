@@ -12,14 +12,23 @@ public class NumbnessStatusEffect extends StatusEffect {
         super(category, color);
     }
 
+    LivingEntity entity;
+    int amplifier;
+
     @Override
-    public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-        super.onApplied(entity, attributes, amplifier);
+    public void onApplied(LivingEntity entity, int amplifier) {
+        this.entity = entity;
+        this.amplifier = amplifier;
+        super.onApplied(entity, amplifier);
     }
 
     @Override
-    public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-        super.onRemoved(entity, attributes, amplifier);
+    public void onRemoved(AttributeContainer attributeContainer) {
+        super.onRemoved(attributeContainer);
+
+        if (entity == null) {
+            return;
+        }
 
         entity.damage(entity.getDamageSources().pypSources().backlash(), PickYourPoisonEntityComponents.NUMBNESS_DAMAGE.get(entity).getDamageAccumulated());
 

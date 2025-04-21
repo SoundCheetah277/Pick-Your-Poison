@@ -1,7 +1,8 @@
 package org.ladysnake.pickyourpoison.cca;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 public class NumbnessRetributionComponent implements AutoSyncedComponent {
     private float damageAccumulated;
@@ -24,13 +25,13 @@ public class NumbnessRetributionComponent implements AutoSyncedComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound compoundTag) {
+    public void readFromNbt(NbtCompound compoundTag, RegistryWrapper.WrapperLookup registryLookup) {
         this.damageAccumulated = compoundTag.getFloat("DamageAccumulated");
         this.fromLicking = compoundTag.getBoolean("FromLicking");
     }
 
     @Override
-    public void writeToNbt(NbtCompound compoundTag) {
+    public void writeToNbt(NbtCompound compoundTag, RegistryWrapper.WrapperLookup registryLookup) {
         compoundTag.putFloat("DamageAccumulated", this.damageAccumulated);
         compoundTag.putBoolean("FromLicking", this.fromLicking);
     }

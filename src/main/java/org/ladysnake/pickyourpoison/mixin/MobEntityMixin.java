@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.mixin;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,7 +18,7 @@ public abstract class MobEntityMixin extends LivingEntity {
 
     @ModifyVariable(method = "setTarget", at = @At("HEAD"), argsOnly = true)
     public LivingEntity setTarget(LivingEntity target) {
-        if (this.hasStatusEffect(PickYourPoison.COMATOSE)) {
+        if (this.hasStatusEffect((PickYourPoison.COMATOSE))) {
             return null;
         }
         return target;

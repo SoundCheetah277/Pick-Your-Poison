@@ -3,6 +3,7 @@ package org.ladysnake.pickyourpoison.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -22,7 +23,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
 
     @ModifyExpressionValue(method = "canSprint", at = @At(value = "CONSTANT", args = "floatValue=6.0"))
     private float replaceMinFoodLevelForSprinting(float foodLevel) {
-        if (this.hasStatusEffect(PickYourPoison.STIMULATION)) {
+        if (this.hasStatusEffect((PickYourPoison.STIMULATION))) {
             return -1.0f;
         }
         return foodLevel;

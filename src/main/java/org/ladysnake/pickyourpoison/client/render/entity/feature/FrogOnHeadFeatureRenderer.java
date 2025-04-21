@@ -15,6 +15,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 
+import java.awt.*;
+
 public class FrogOnHeadFeatureRenderer extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
     public static FrogOnHeadModel FROG_MODEL;
 
@@ -30,7 +32,8 @@ public class FrogOnHeadFeatureRenderer extends FeatureRenderer<AbstractClientPla
             if (item instanceof PoisonDartFrogBowlItem poisonDartFrogBowlItem) {
                 matrices.push();
                 getContextModel().head.rotate(matrices);
-                FROG_MODEL.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutout(poisonDartFrogBowlItem.texture)), light, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
+                int color = new Color(1.0f, 1.0f, 1.0f, 1.0f).getRGB(); // The color
+                FROG_MODEL.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutout(poisonDartFrogBowlItem.texture)), light, OverlayTexture.DEFAULT_UV, color);
                 matrices.pop();
             }
         }

@@ -1,8 +1,5 @@
 package org.ladysnake.pickyourpoison.client;
 
-import ladysnake.satin.api.event.ShaderEffectRenderCallback;
-import ladysnake.satin.api.managed.ManagedShaderEffect;
-import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -12,6 +9,9 @@ import org.ladysnake.pickyourpoison.client.render.entity.PoisonDartEntityRendere
 import org.ladysnake.pickyourpoison.client.render.entity.PoisonDartFrogEntityRenderer;
 import org.ladysnake.pickyourpoison.client.render.model.FrogOnHeadModel;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
+import org.ladysnake.satin.api.event.ShaderEffectRenderCallback;
+import org.ladysnake.satin.api.managed.ManagedShaderEffect;
+import org.ladysnake.satin.api.managed.ShaderEffectManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class PickYourPoisonClient implements ClientModInitializer {
     public static final ArrayList<UUID> FROGGY_PLAYERS_CLIENT = new ArrayList<>();
     private static final String FROGGY_PLAYERS_URL = "https://doctor4t.ladysnake.org/pyp-data";
     private static final ManagedShaderEffect BLACK_SCREEN = ShaderEffectManager.getInstance()
-            .manage(new Identifier("pickyourpoison", "shaders/post/blackscreen.json"));
+            .manage(Identifier.of("pickyourpoison", "shaders/post/blackscreen.json"));
 
     @Override
     public void onInitializeClient() {

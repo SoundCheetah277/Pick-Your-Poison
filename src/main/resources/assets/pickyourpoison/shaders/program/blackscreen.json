@@ -10,9 +10,7 @@
     "Position"
   ],
   "samplers": [
-    {
-      "name": "DiffuseSampler"
-    }
+
   ],
   "uniforms": [
     {
@@ -35,24 +33,6 @@
         0.0,
         0.0,
         0.0,
-        1.0
-      ]
-    },
-    {
-      "name": "InSize",
-      "type": "float",
-      "count": 2,
-      "values": [
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "OutSize",
-      "type": "float",
-      "count": 2,
-      "values": [
-        1.0,
         1.0
       ]
     }

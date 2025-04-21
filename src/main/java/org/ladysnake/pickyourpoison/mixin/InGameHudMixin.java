@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.mixin;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -19,26 +20,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
     @Unique
-    private static final Identifier BATRACHOTOXIN_HEARTS = new Identifier("pickyourpoison", "textures/gui/batrachotoxin_hearts.png");
+    private static final Identifier BATRACHOTOXIN_HEARTS = Identifier.of("pickyourpoison", "textures/gui/batrachotoxin_hearts.png");
     @Unique
-    private static final Identifier TORPOR_HEARTS = new Identifier("pickyourpoison", "textures/gui/torpor_hearts.png");
+    private static final Identifier TORPOR_HEARTS = Identifier.of("pickyourpoison", "textures/gui/torpor_hearts.png");
     @Unique
-    private static final Identifier NUMBNESS_HEARTS = new Identifier("pickyourpoison", "textures/gui/numbness_hearts.png");
+    private static final Identifier NUMBNESS_HEARTS = Identifier.of("pickyourpoison", "textures/gui/numbness_hearts.png");
 
     @Inject(method = "drawHeart", at = @At("HEAD"), cancellable = true)
-    private void pickyourpoison$drawCustomHeart(DrawContext context, InGameHud.HeartType type, int x, int y, int v, boolean blinking, boolean halfHeart, CallbackInfo ci) {
-        if (!blinking && type == InGameHud.HeartType.NORMAL && MinecraftClient.getInstance().cameraEntity instanceof PlayerEntity player && (player.hasStatusEffect(PickYourPoison.BATRACHOTOXIN) || player.hasStatusEffect(PickYourPoison.TORPOR) || player.hasStatusEffect(PickYourPoison.NUMBNESS))) {
+    private void pickyourpoison$drawCustomHeart(DrawContext context, InGameHud.HeartType type, int x, int y, boolean hardcore, boolean blinking, boolean half, CallbackInfo ci) {
+        if (!blinking && type == InGameHud.HeartType.NORMAL && MinecraftClient.getInstance().cameraEntity instanceof PlayerEntity player && (player.hasStatusEffect((PickYourPoison.BATRACHOTOXIN)) || player.hasStatusEffect((PickYourPoison.TORPOR)) || player.hasStatusEffect((PickYourPoison.NUMBNESS)))) {
             Identifier textureId;
-            if (player.hasStatusEffect(PickYourPoison.TORPOR)) {
+            if (player.hasStatusEffect((PickYourPoison.TORPOR))) {
                 textureId = TORPOR_HEARTS;
-            } else if (player.hasStatusEffect(PickYourPoison.BATRACHOTOXIN)) {
+            } else if (player.hasStatusEffect((PickYourPoison.BATRACHOTOXIN))) {
                 textureId = BATRACHOTOXIN_HEARTS;
-            } else if (player.hasStatusEffect(PickYourPoison.NUMBNESS)) {
+            } else if (player.hasStatusEffect((PickYourPoison.NUMBNESS))) {
                 textureId = NUMBNESS_HEARTS;
             } else {
                 return;
             }
-            context.drawTexture(textureId, x, y, halfHeart ? 9 : 0, v, 9, 9);
+            context.drawTexture(textureId, x, y, half ? 9 : 0, 0, 9, 9);
             ci.cancel();
         }
     }

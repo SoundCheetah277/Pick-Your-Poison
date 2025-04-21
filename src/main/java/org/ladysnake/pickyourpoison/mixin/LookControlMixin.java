@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.mixin;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.mob.MobEntity;
@@ -18,7 +19,7 @@ public class LookControlMixin {
 
     @Inject(method = "lookAt(DDDFF)V", at = @At("HEAD"), cancellable = true)
     public void lookAt(double x, double y, double z, float maxYawChange, float maxPitchChange, CallbackInfo callbackInfo) {
-        if (this.entity.hasStatusEffect(PickYourPoison.COMATOSE)) {
+        if (this.entity.hasStatusEffect((PickYourPoison.COMATOSE))) {
             callbackInfo.cancel();
         }
     }

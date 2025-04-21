@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.mixin;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.mob.MobEntity;
@@ -18,7 +19,7 @@ public class EntityNavigationMixin {
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (entity.hasStatusEffect(PickYourPoison.COMATOSE)) {
+        if (entity.hasStatusEffect((PickYourPoison.COMATOSE))) {
             ci.cancel();
         }
     }

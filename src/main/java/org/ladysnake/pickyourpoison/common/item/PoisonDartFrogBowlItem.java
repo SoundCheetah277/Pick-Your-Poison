@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.common.item;
 
+import net.minecraft.component.DataComponentTypes;
 import org.ladysnake.pickyourpoison.cca.PickYourPoisonEntityComponents;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import org.ladysnake.pickyourpoison.common.entity.PoisonDartFrogEntity;
@@ -50,8 +51,8 @@ public class PoisonDartFrogBowlItem extends Item {
         return type;
     }
 
+    @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        super.finishUsing(stack, world, user);
         if (user instanceof ServerPlayerEntity) {
             ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) user;
             Criteria.CONSUME_ITEM.trigger(serverPlayerEntity, stack);
@@ -84,7 +85,7 @@ public class PoisonDartFrogBowlItem extends Item {
             poisonDartFrog.setPoisonDartFrogType(type);
             poisonDartFrog.fromBowl = true;
 
-            if (context.getStack().hasCustomName()) {
+            if (context.getStack().getComponents().contains(DataComponentTypes.CUSTOM_NAME)) {
                 poisonDartFrog.setCustomName(context.getStack().getName());
             }
 
@@ -117,6 +118,7 @@ public class PoisonDartFrogBowlItem extends Item {
         return PickYourPoison.ITEM_POISON_DART_FROG_BOWL_LICK;
     }
 
+    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (PoisonDartFrogEntity.getFrogPoisonEffect(getFrogType(user.getStackInHand(hand).getItem())) != null && user.hasStatusEffect(PoisonDartFrogEntity.getFrogPoisonEffect(getFrogType(user.getStackInHand(hand).getItem())).getEffectType())) {
             return TypedActionResult.pass(user.getStackInHand(hand));

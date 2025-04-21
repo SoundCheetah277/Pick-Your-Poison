@@ -2,6 +2,8 @@ package org.ladysnake.pickyourpoison.common.entity;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.world.ServerWorld;
@@ -41,14 +44,10 @@ import org.jetbrains.annotations.Nullable;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import org.ladysnake.pickyourpoison.common.entity.ai.JumpAroundGoal;
 import org.ladysnake.pickyourpoison.common.entity.ai.PoisonDartFrogWanderAroundFarGoal;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
@@ -70,14 +69,14 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     }
 
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData) {
         if (this.random.nextInt(100) == 0) {
             this.setPoisonDartFrogType(Type.LUXINTRUS);
         } else {
             this.setPoisonDartFrogType(getRandomNaturalType(random));
         }
 
-        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+        return super.initialize(world, difficulty, spawnReason, entityData);
     }
 
     public static Type getRandomNaturalType(Random random) {
@@ -89,24 +88,27 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     }
 
     public static StatusEffectInstance getFrogPoisonEffect(Type type) {
+        if (type == null) {
+            return null;
+        }
         switch (type) {
             case BLUE -> {
-                return new StatusEffectInstance(PickYourPoison.COMATOSE, 400); // 20s
+                return new StatusEffectInstance((PickYourPoison.COMATOSE), 400); // 20s
             }
             case GOLDEN -> {
-                return new StatusEffectInstance(PickYourPoison.BATRACHOTOXIN, 600); // 30s
+                return new StatusEffectInstance((PickYourPoison.BATRACHOTOXIN), 600); // 30s
             }
             case GREEN -> {
-                return new StatusEffectInstance(PickYourPoison.NUMBNESS, 400); // 20s
+                return new StatusEffectInstance((PickYourPoison.NUMBNESS), 400); // 20s
             }
             case ORANGE -> {
-                return new StatusEffectInstance(PickYourPoison.VULNERABILITY, 600); // 30s
+                return new StatusEffectInstance((PickYourPoison.VULNERABILITY), 600); // 30s
             }
             case CRIMSON -> {
-                return new StatusEffectInstance(PickYourPoison.TORPOR, 600); // 30s
+                return new StatusEffectInstance((PickYourPoison.TORPOR), 600); // 30s
             }
             case RED -> {
-                return new StatusEffectInstance(PickYourPoison.STIMULATION, 400); // 20s
+                return new StatusEffectInstance((PickYourPoison.STIMULATION), 400); // 20s
             }
             case LUXINTRUS -> {
                 return new StatusEffectInstance(StatusEffects.BLINDNESS, 1200); // 60s
@@ -152,15 +154,19 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
+//    @Override
+//    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+//
+//    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.animationCache;
     }
 
-    protected void initDataTracker() {
-        super.initDataTracker();
-
-        this.dataTracker.startTracking(TYPE, Type.BLUE.toString());
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(TYPE, Type.BLUE.toString());
     }
 
     @Override
@@ -200,7 +206,7 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
 
             ItemStack itemStack = new ItemStack(item);
             if (this.hasCustomName()) {
-                itemStack.setCustomName(this.getCustomName());
+                itemStack.set(DataComponentTypes.CUSTOM_NAME, this.getCustomName());
             }
 
             if (!player.getAbilities().creativeMode) {
@@ -239,8 +245,8 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     @Override
     protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
         if (!this.getWorld().isClient && onGround && this.fallDistance > 0.0F) {
-            this.removeSoulSpeedBoost();
-            this.addSoulSpeedBoostIfNeeded();
+            //this.removeSoulSpeedBoost(); //TODO if needed, add this back, but it is now relocated somewhere else
+            //this.addSoulSpeedBoostIfNeeded();
         }
 
         if (onGround) {
@@ -262,6 +268,7 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
     }
 
     public void setPoisonDartFrogType(Type type) {
+        //builder.add(TYPE, Type.BLUE.toString());
         this.dataTracker.set(TYPE, type.toString());
     }
 
@@ -274,6 +281,11 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
         if (tag.contains("FrogType")) {
             this.setPoisonDartFrogType(Type.valueOf(tag.getString("FrogType")));
         }
+    }
+
+    @Override
+    public boolean isBreedingItem(ItemStack stack) {
+        return false;
     }
 
     @Override
@@ -309,7 +321,7 @@ public class PoisonDartFrogEntity extends AnimalEntity implements GeoEntity {
 
     @Override
     public boolean canHaveStatusEffect(StatusEffectInstance effect) {
-        StatusEffect statusEffect = effect.getEffectType();
+        StatusEffect statusEffect = effect.getEffectType().value();
         return statusEffect != StatusEffects.POISON && statusEffect != PickYourPoison.BATRACHOTOXIN && statusEffect != PickYourPoison.COMATOSE && statusEffect != PickYourPoison.NUMBNESS && statusEffect != PickYourPoison.STIMULATION && statusEffect != PickYourPoison.TORPOR && statusEffect != PickYourPoison.VULNERABILITY;
     }
 

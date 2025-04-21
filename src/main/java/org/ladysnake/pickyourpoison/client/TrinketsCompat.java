@@ -20,6 +20,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 
+import java.awt.*;
 import java.util.Optional;
 
 public class TrinketsCompat {
@@ -35,7 +36,7 @@ public class TrinketsCompat {
                     } else if (!entity.isInvisible() && PickYourPoisonClient.FROGGY_PLAYERS_CLIENT.contains(entity.getUuid())) {
                         matrices.push();
                         ((PlayerEntityModel<AbstractClientPlayerEntity>) contextModel).head.rotate(matrices);
-                        model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutout(item.texture)), light, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
+                        model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutout(item.texture)), light, OverlayTexture.DEFAULT_UV, new Color(1.0f, 1.0f, 1.0f, 1.0f).getRGB());
                         matrices.pop();
                     }
                 }

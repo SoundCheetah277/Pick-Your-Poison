@@ -12,7 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class FrogOnHeadModel extends Model {
-    public static final EntityModelLayer MODEL_LAYER = new EntityModelLayer(new Identifier(PickYourPoison.MODID, "frog"), "main");
+    public static final EntityModelLayer MODEL_LAYER = new EntityModelLayer(Identifier.of(PickYourPoison.MODID, "frog"), "main");
     private final ModelPart frog;
 
     public FrogOnHeadModel(ModelPart root) {
@@ -53,8 +53,14 @@ public class FrogOnHeadModel extends Model {
         return TexturedModelData.of(modelData, 32, 32);
     }
 
+    public void setRotationAngle(ModelPart bone, float x, float y, float z) {
+        bone.pitch = x;
+        bone.yaw = y;
+        bone.roll = z;
+    }
+
     @Override
-    public void render(MatrixStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void render(MatrixStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         matrixStack.push();
         matrixStack.scale(0.75f, 0.75f, 0.75f);
         matrixStack.translate(0f, -0.21f, 0f);
@@ -62,9 +68,7 @@ public class FrogOnHeadModel extends Model {
         matrixStack.pop();
     }
 
-    public void setRotationAngle(ModelPart bone, float x, float y, float z) {
-        bone.pitch = x;
-        bone.yaw = y;
-        bone.roll = z;
-    }
+//    public void render(MatrixStack matrices, VertexConsumer buffer, int light, int defaultUv, float v, float v1, float v2, float v3) {
+//
+//    }
 }

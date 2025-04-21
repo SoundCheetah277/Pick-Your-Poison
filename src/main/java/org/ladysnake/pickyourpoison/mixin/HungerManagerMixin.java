@@ -1,5 +1,6 @@
 package org.ladysnake.pickyourpoison.mixin;
 
+import net.minecraft.registry.entry.RegistryEntry;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import org.ladysnake.pickyourpoison.common.damage.PoisonDamageSources;
 import net.minecraft.entity.player.HungerManager;
@@ -27,8 +28,8 @@ public abstract class HungerManagerMixin {
 
     @Inject(method = "update", at = @At("HEAD"), cancellable = true)
     public void update(PlayerEntity player, CallbackInfo callbackInfo) {
-        if (player.hasStatusEffect(PickYourPoison.STIMULATION)) {
-            int stimulationLevel = player.getStatusEffect(PickYourPoison.STIMULATION).getAmplifier() + 1;
+        if (player.hasStatusEffect((PickYourPoison.STIMULATION))) {
+            int stimulationLevel = player.getStatusEffect((PickYourPoison.STIMULATION)).getAmplifier() + 1;
 
             Difficulty difficulty = player.getWorld().getDifficulty();
             this.prevFoodLevel = this.foodLevel;

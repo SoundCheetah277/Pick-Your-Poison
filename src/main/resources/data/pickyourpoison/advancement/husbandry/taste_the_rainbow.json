@@ -2,7 +2,7 @@
   "parent": "pickyourpoison:husbandry/taste_test",
   "display": {
     "icon": {
-      "item": "pickyourpoison:golden_poison_dart_frog_bowl"
+      "id": "pickyourpoison:golden_poison_dart_frog_bowl"
     },
     "title": {
       "translate": "pickyourpoison:advancements.husbandry.taste_the_rainbow.title"

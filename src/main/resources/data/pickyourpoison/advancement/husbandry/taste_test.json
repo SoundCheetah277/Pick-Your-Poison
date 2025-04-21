@@ -2,7 +2,7 @@
   "parent": "minecraft:husbandry/root",
   "display": {
     "icon": {
-      "item": "pickyourpoison:blue_poison_dart_frog_bowl"
+      "id": "pickyourpoison:blue_poison_dart_frog_bowl"
     },
     "title": {
       "translate": "pickyourpoison:advancements.husbandry.taste_test.title"
@@ -17,12 +17,12 @@
   },
   "criteria": {
     "lick_frog": {
-      "trigger": "consume_item",
       "conditions": {
         "item": {
-          "tag": "pickyourpoison:poison_dart_frog_bowls"
+          "items": "#pickyourpoison:poison_dart_frog_bowls"
         }
-      }
+      },
+      "trigger": "minecraft:consume_item"
     }
   },
   "requirements": [

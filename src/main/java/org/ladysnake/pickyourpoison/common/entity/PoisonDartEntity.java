@@ -1,6 +1,12 @@
 package org.ladysnake.pickyourpoison.common.entity;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleUtil;
+import org.jetbrains.annotations.Nullable;
 import org.ladysnake.pickyourpoison.common.PickYourPoison;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -15,11 +21,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Util;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Set;
 
 public class PoisonDartEntity extends PersistentProjectileEntity {
@@ -32,12 +38,12 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         super(entityType, world);
     }
 
-    public PoisonDartEntity(World world, double x, double y, double z) {
-        super(PickYourPoison.POISON_DART, x, y, z, world);
+    public PoisonDartEntity(World world, double x, double y, double z, ItemStack itemStack) {
+        super(PickYourPoison.POISON_DART, x, y, z, world, itemStack, null);
     }
 
-    public PoisonDartEntity(World world, LivingEntity owner) {
-        super(PickYourPoison.POISON_DART, owner, world);
+    public PoisonDartEntity(World world, LivingEntity owner, ItemStack itemStack) {
+        super(PickYourPoison.POISON_DART, owner, world, itemStack, null);
     }
 
     protected ItemStack getItem() {
@@ -53,20 +59,21 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         return 0.1f;
     }
 
-    @Override
-    public int getPunch() {
-        return 0;
-    }
+//    @Override
+//    public int getPunch() {
+//        return 0;
+//    }
+    // TODO: implement punch
 
     public void addEffect(StatusEffectInstance effect) {
         this.effects.add(effect);
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.dataTracker.startTracking(COLOR, -1);
-        this.getDataTracker().startTracking(ITEM, ItemStack.EMPTY);
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(COLOR, -1);
+        builder.add(ITEM, ItemStack.EMPTY);
     }
 
     @Override
@@ -114,7 +121,9 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         double e = (double) (i >> 8 & 0xFF) / 255.0;
         double f = (double) (i >> 0 & 0xFF) / 255.0;
         for (int j = 0; j < amount; ++j) {
-            this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
+            // For some reason ENTITY_EFFECT is one of the few particles that is not a SimpleParticleType
+            // So for now, just using the EFFECT particle
+            this.getWorld().addParticle(ParticleTypes.EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
         }
     }
 
@@ -137,27 +146,40 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         if (!this.effects.isEmpty()) {
             NbtList nbtList = new NbtList();
             for (StatusEffectInstance statusEffectInstance : this.effects) {
-                nbtList.add(statusEffectInstance.writeNbt(new NbtCompound()));
+                nbtList.add(statusEffectInstance.writeNbt());
             }
             nbt.put("CustomPotionEffects", nbtList);
-        }
-
-        if (!this.getItem().isEmpty()) {
-            nbt.put("Item", this.getItem().writeNbt(new NbtCompound()));
         }
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        for (StatusEffectInstance statusEffectInstance : PotionUtil.getCustomPotionEffects(nbt)) {
+        for (StatusEffectInstance statusEffectInstance : getCustomPotionEffects(nbt)) {
             this.addEffect(statusEffectInstance);
         }
         if (nbt.contains("Color", 99)) {
             this.setColor(nbt.getInt("Color"));
         }
 
-        this.setItem(ItemStack.fromNbt(nbt.getCompound("Item")));
+        this.setItem(ItemStack.fromNbt(this.getRegistryManager(), nbt.getCompound("Item")).get());
+    }
+
+    /// Derived from the legacy 1.20.1 minecraft source from the PotionUtil class
+    public static List<StatusEffectInstance> getCustomPotionEffects(@Nullable NbtCompound nbt) {
+        List<StatusEffectInstance> list = Lists.newArrayList();
+        if (nbt != null && nbt.contains("CustomPotionEffects", 9)) {
+            NbtList nbtList = nbt.getList("CustomPotionEffects", 10);
+
+            for(int i = 0; i < nbtList.size(); ++i) {
+                NbtCompound nbtCompound = nbtList.getCompound(i);
+                StatusEffectInstance statusEffectInstance = StatusEffectInstance.fromNbt(nbtCompound);
+                if (statusEffectInstance != null) {
+                    list.add(statusEffectInstance);
+                }
+            }
+        }
+        return list;
     }
 
     @Override
@@ -178,6 +200,11 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
     }
 
     @Override
+    protected ItemStack getDefaultItemStack() {
+        return null;
+    }
+
+    @Override
     public void handleStatus(byte status) {
         if (status == 0) {
             int i = this.getColor();
@@ -186,7 +213,9 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
                 double e = (double) (i >> 8 & 0xFF) / 255.0;
                 double f = (double) (i >> 0 & 0xFF) / 255.0;
                 for (int j = 0; j < 20; ++j) {
-                    this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
+                    // For some reason ENTITY_EFFECT is one of the few particles that is not a SimpleParticleType
+                    // So for now, just using the EFFECT particle
+                    this.getWorld().addParticle(ParticleTypes.EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
                 }
             }
         } else {
