@@ -27,7 +27,7 @@ public class FrogOnHeadFeatureRenderer extends FeatureRenderer<AbstractClientPla
 
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
-        if (!entity.isInvisible() && PickYourPoisonClient.FROGGY_PLAYERS_CLIENT.contains(entity.getUuid())) {
+        if (!entity.isInvisible()) {
             Item item = entity.getEquippedStack(EquipmentSlot.HEAD).getItem();
             if (item instanceof PoisonDartFrogBowlItem poisonDartFrogBowlItem) {
                 matrices.push();
