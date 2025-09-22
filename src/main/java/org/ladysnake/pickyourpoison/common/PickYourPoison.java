@@ -9,11 +9,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
-import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -24,11 +22,11 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
@@ -48,7 +46,6 @@ import org.ladysnake.pickyourpoison.common.statuseffect.EmptyStatusEffect;
 import org.ladysnake.pickyourpoison.common.statuseffect.NumbnessStatusEffect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.bernie.geckolib.GeckoLib;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -196,7 +193,7 @@ public class PickYourPoison implements ModInitializer {
         registerEntity("poison_dart_frog", POISON_DART_FROG);
         FabricDefaultAttributeRegistry.register(POISON_DART_FROG, PoisonDartFrogEntity.createPoisonDartFrogAttributes());
         BiomeModifications.addSpawn(
-                biome -> biome.hasTag(ConventionalBiomeTags.JUNGLE),
+                biome -> biome.getBiomeRegistryEntry().isIn(BiomeTags.IS_JUNGLE),
                 SpawnGroup.CREATURE, POISON_DART_FROG, 50, 2, 5
         );
         registerEntity("poison_dart", POISON_DART);
