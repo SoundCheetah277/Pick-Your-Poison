@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleUtil;
 import org.jetbrains.annotations.Nullable;
@@ -119,7 +120,8 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         for (int j = 0; j < amount; ++j) {
             // For some reason ENTITY_EFFECT is one of the few particles that is not a SimpleParticleType
             // So for now, just using the EFFECT particle
-            this.getWorld().addParticle(ParticleTypes.EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
+            //Not anymore vro - dav
+            this.getWorld().addParticle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, (float)d, (float)e, (float)f), this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), 0.0, 0.0, 0.0);
         }
     }
 
@@ -211,7 +213,8 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
                 for (int j = 0; j < 20; ++j) {
                     // For some reason ENTITY_EFFECT is one of the few particles that is not a SimpleParticleType
                     // So for now, just using the EFFECT particle
-                    this.getWorld().addParticle(ParticleTypes.EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
+                    // Nop not anymore i fixed dat vro
+                    this.getWorld().addParticle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, (float)d, (float)e, (float)f), this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), 0.0, 0.0, 0.0);
                 }
             }
         } else {
@@ -224,4 +227,3 @@ public class PoisonDartEntity extends PersistentProjectileEntity {
         return PickYourPoison.ENTITY_POISON_DART_HIT;
     }
 }
-
