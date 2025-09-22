@@ -196,7 +196,7 @@ public class PickYourPoison implements ModInitializer {
         registerEntity("poison_dart_frog", POISON_DART_FROG);
         FabricDefaultAttributeRegistry.register(POISON_DART_FROG, PoisonDartFrogEntity.createPoisonDartFrogAttributes());
         BiomeModifications.addSpawn(
-                biome -> biome.hasTag(ConventionalBiomeTags.JUNGLE),
+                biome -> biome.getBiomeRegistryEntry().isIn(BiomeTags.IS_JUNGLE),
                 SpawnGroup.CREATURE, POISON_DART_FROG, 50, 2, 5
         );
         registerEntity("poison_dart", POISON_DART);
