@@ -13,17 +13,22 @@ import org.ladysnake.satin.api.event.ShaderEffectRenderCallback;
 import org.ladysnake.satin.api.managed.ManagedShaderEffect;
 import org.ladysnake.satin.api.managed.ShaderEffectManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PickYourPoisonClient implements ClientModInitializer {
-    // Everyone is now considered froggy, so this list is no longer used
     public static final ArrayList<UUID> FROGGY_PLAYERS_CLIENT = new ArrayList<>();
+    private static final String FROGGY_PLAYERS_URL = "https://doctor4t.ladysnake.org/pyp-data";
     private static final ManagedShaderEffect BLACK_SCREEN = ShaderEffectManager.getInstance()
             .manage(Identifier.of("pickyourpoison", "shaders/post/blackscreen.json"));
 
     @Override
     public void onInitializeClient() {
+        // FROGGY COSMETICS
+        new ClientFroggyPlayerListLoaderThread().start();
+
         // MODEL LAYERS
         EntityRendererRegistry.register(PickYourPoison.POISON_DART_FROG, PoisonDartFrogEntityRenderer::new);
         EntityRendererRegistry.register(PickYourPoison.POISON_DART, PoisonDartEntityRenderer::new);
@@ -41,4 +46,26 @@ public class PickYourPoisonClient implements ClientModInitializer {
             TrinketsCompat.registerFrogTrinketRenderers(PickYourPoison.getAllFrogBowls());
         }
     }
+
+    private static class ClientFroggyPlayerListLoaderThread extends Thread {
+        public ClientFroggyPlayerListLoaderThread() {
+            setName("Pick Your Poison Equippable Frogs Thread");
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            try {
+                List<UUID> list = PickYourPoison.JsonReader.readJsonFromUrl(FROGGY_PLAYERS_URL);
+                synchronized (FROGGY_PLAYERS_CLIENT) {
+                    FROGGY_PLAYERS_CLIENT.clear();
+                    FROGGY_PLAYERS_CLIENT.addAll(list);
+                }
+            } catch (IOException e) {
+                PickYourPoison.LOGGER.error("Failed to load froggy list.");
+            }
+        }
+
+    }
+
 }
