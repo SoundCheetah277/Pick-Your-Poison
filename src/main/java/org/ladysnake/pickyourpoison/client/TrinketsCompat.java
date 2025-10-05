@@ -33,16 +33,10 @@ public class TrinketsCompat {
                 public void render(ItemStack stack, SlotReference slotReference, EntityModel<? extends LivingEntity> contextModel, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, LivingEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
                     if (model == null) {
                         model = new FrogOnHeadModel(MinecraftClient.getInstance().getEntityModelLoader().getModelPart(FrogOnHeadModel.MODEL_LAYER));
-                    } else if (!entity.isInvisible()) {
+                    } else if (!entity.isInvisible() && PickYourPoisonClient.FROGGY_PLAYERS_CLIENT.contains(entity.getUuid())) {
                         matrices.push();
                         ((PlayerEntityModel<AbstractClientPlayerEntity>) contextModel).head.rotate(matrices);
-                        model.render(
-                                matrices,
-                                vertexConsumers.getBuffer(RenderLayer.getEntityCutout(item.texture)),
-                                light,
-                                OverlayTexture.DEFAULT_UV,
-                                new Color(1.0f, 1.0f, 1.0f, 1.0f).getRGB()
-                        );
+                        model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityCutout(item.texture)), light, OverlayTexture.DEFAULT_UV, new Color(1.0f, 1.0f, 1.0f, 1.0f).getRGB());
                         matrices.pop();
                     }
                 }
