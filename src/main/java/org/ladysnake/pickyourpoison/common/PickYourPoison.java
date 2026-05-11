@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -29,6 +30,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPointer;
@@ -37,6 +39,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.pickyourpoison.common.entity.PoisonDartEntity;
 import org.ladysnake.pickyourpoison.common.entity.PoisonDartFrogEntity;
@@ -47,21 +50,22 @@ import org.ladysnake.pickyourpoison.common.statuseffect.NumbnessStatusEffect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import static org.ladysnake.pickyourpoison.client.PickYourPoisonClient.FROGGY_PLAYERS_CLIENT;
+import static org.ladysnake.pickyourpoison.client.PickYourPoisonClient.FROGGY_PLAYERS_URL;
 
 public class PickYourPoison implements ModInitializer {
     public static final String MODID = "pickyourpoison";
     // STATUS EFFECTS
     public static final RegistryEntry<StatusEffect> VULNERABILITY = registerStatusEffect("vulnerability", new EmptyStatusEffect(StatusEffectCategory.HARMFUL, 0xFF891C));
-    //    public static final ArrayList<UUID> FROGGY_PLAYERS = new ArrayList<>();
+    public static final ArrayList<UUID> FROGGY_PLAYERS = new ArrayList<>();
     public static final RegistryEntry<StatusEffect> COMATOSE = registerStatusEffect("comatose", new EmptyStatusEffect(StatusEffectCategory.HARMFUL, 0x35A2F3));
     public static final RegistryEntry<StatusEffect> NUMBNESS = registerStatusEffect("numbness", new NumbnessStatusEffect(StatusEffectCategory.HARMFUL, 0x62B229));
     public static final RegistryEntry<StatusEffect> TORPOR = registerStatusEffect("torpor", new EmptyStatusEffect(StatusEffectCategory.HARMFUL, 0xD8C0B8));
@@ -69,6 +73,8 @@ public class PickYourPoison implements ModInitializer {
     public static final RegistryEntry<StatusEffect> STIMULATION = registerStatusEffect("stimulation", new EmptyStatusEffect(StatusEffectCategory.HARMFUL, 0xD85252).addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, Identifier.of("91aeaa56-376b-4498-935b-2f7f68070635"), 0.2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)); // TODO not sure about this
     public static final boolean isTrinketsLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
     // ENTITIES
+
+    //TODO Update these on further updates to EntityType.Builder
     public static final EntityType<PoisonDartFrogEntity> POISON_DART_FROG = FabricEntityTypeBuilder.createMob()
             .entityFactory(PoisonDartFrogEntity::new)
             .spawnGroup(SpawnGroup.CREATURE)
@@ -186,8 +192,8 @@ public class PickYourPoison implements ModInitializer {
     @Override
     public void onInitialize() {
         // FROGGY COSMETICS
-//        ServerLifecycleEvents.SERVER_STARTING.register(server -> new FroggyPlayerListLoaderThread().start());
-//        ServerLifecycleEvents.SERVER_STOPPING.register(server -> FROGGY_PLAYERS.clear());
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> new FroggyPlayerListLoaderThread().start());
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> FROGGY_PLAYERS_CLIENT.clear());
 
         // ENTITIES
         registerEntity("poison_dart_frog", POISON_DART_FROG);
@@ -264,30 +270,29 @@ public class PickYourPoison implements ModInitializer {
         return new FoodComponent.Builder().alwaysEdible().build();
     }
 
-//    private static class FroggyPlayerListLoaderThread extends Thread {
-//        public FroggyPlayerListLoaderThread() {
-//            setName("Pick Your Poison Equippable Frogs Thread");
-//            setDaemon(true);
-//        }
-//
-//        @Override
-//        public void run() {
-//            try (BufferedInputStream stream = IOUtils.buffer(new URL(FROGGY_PLAYERS_URL).openStream())) {
-//                Properties properties = new Properties();
-//                properties.load(stream);
-//                synchronized (FROGGY_PLAYERS) {
-//                    FROGGY_PLAYERS.clear();
-//                    for (Object o : JsonReader.readJsonFromUrl(FROGGY_PLAYERS_URL).toList()) {
-//                        FROGGY_PLAYERS.add(UUID.fromString((String) o));
-//                    }
+    private static class FroggyPlayerListLoaderThread extends Thread {
+        public FroggyPlayerListLoaderThread() {
+            setName("Pick Your Poison Equippable Frogs Thread");
+            setDaemon(true);
+        }
 
-    /// /                    System.out.println(FROGGY_PLAYERS);
-//                }
-//            } catch (IOException e) {
-//                LOGGER.error("Failed to load froggy list.");
-//            }
-//        }
-//    }
+        @Override
+        public void run() {
+            try (BufferedInputStream stream = IOUtils.buffer(new URL(FROGGY_PLAYERS_URL).openStream())) {
+                Properties properties = new Properties();
+                properties.load(stream);
+                synchronized (FROGGY_PLAYERS) {
+                    FROGGY_PLAYERS.clear();
+                    for (Object o : JsonReader.readJsonFromUrl(FROGGY_PLAYERS_URL).toList()) {
+                        FROGGY_PLAYERS.add(UUID.fromString((String) o));
+                    }
+                    System.out.println(FROGGY_PLAYERS);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Failed to load froggy list.");
+            }
+        }
+    }
 
     public static class JsonReader {
 
