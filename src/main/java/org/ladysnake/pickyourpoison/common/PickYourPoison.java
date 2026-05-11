@@ -30,7 +30,6 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPointer;
@@ -55,6 +54,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -283,7 +283,7 @@ public class PickYourPoison implements ModInitializer {
                 properties.load(stream);
                 synchronized (FROGGY_PLAYERS) {
                     FROGGY_PLAYERS.clear();
-                    for (Object o : JsonReader.readJsonFromUrl(FROGGY_PLAYERS_URL).toList()) {
+                    for (Object o : JsonReader.readJsonFromUrl(FROGGY_PLAYERS_URL).stream().toList()) {
                         FROGGY_PLAYERS.add(UUID.fromString((String) o));
                     }
                     System.out.println(FROGGY_PLAYERS);
